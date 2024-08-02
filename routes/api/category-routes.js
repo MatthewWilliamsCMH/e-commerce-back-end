@@ -10,10 +10,13 @@ router.get('/', async (req, res) => {
     const categoryData = await Category.findAll({
       include: [{model: Product}]
     });
-    res.status(200).json(categoryData);
+    if (!categoryData) {
+      return res.status(404).json({message: "No categories found!"})
+    }
+   res.status(200).json(categoryData); //need return here?
   }
   catch (err) {
-    res.status(500).json(err);
+    return res.status(500).json({message: "Error retrieving categories.", error: err.message});
   }
 });
 
@@ -24,10 +27,13 @@ router.get('/:id', async (req, res) => {
     const categoryData = await Category.findOne({
       include: [{model: Product}]
     });
-    res.status(200).json(categoryData);
+    if (!categoryData) {
+      return res.status(404).json({message: "Category not found."})
+    }
+    res.status(200).json(categoryData); //need return here?
   }
   catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({message: "Error retrieving category.", error: err.message});
   }
 });
 
@@ -37,26 +43,34 @@ router.post('/', async (req, res) => {
     const categoryData = await Category.create({
       category_name: req.body.category_name,
     });
-    res.status(200).json(category);
+    res.status(200).json({message: "Category added."}); //return here?
   }
-  catch((err) => {
-    res.status(500).json({message: "Unable to create category."});
-  });
+  catch(err) {
+    return res.status(500).json({message: "Error creating category.", error: err.message});
+  };
 });
 
 router.put('/:id', async (req, res) => {
   // update a category by its `id` value
   try {
-    Category.update(req.body, {
-      where: {
-        id: req.params.id,
+    const categoryData = await Category.update(
+      {
+        category_name: req.body.category_name
       },
-      res.status(200).json(category);
-    });
+      {
+        where: {
+          id: req.params.id,
+        }
+      }
+    )
+    if (!categoryData) {
+      return res.status(404).json({message: "Category not found."})
+    }
+    res.status(200).json({message: "Category updated."}); //return here?
   }
-  catch((err) => {
-    res.status(500).json({message: "Unable to update category."});
-  });
+  catch(err) {
+    return res.status(500).json({message: "Error updating category.", error: err.message});
+  }
 });
 
 router.delete('/:id', async (req, res) => {
@@ -68,13 +82,11 @@ router.delete('/:id', async (req, res) => {
       }
     });
     if (!categoryData) {
-      res.status(404).json({ message: 'No category found to delete.' });
-      return;
+      return res.status(404).json({ message: 'Category not found.' });
     }
-    res.status(200).json(categoryData);
-  } 
-  catch (err) {
-    res.status(500).json(err);
+    res.status(200).json({message: "Category deleted."}); //return here?
+  } catch (err) {
+      return res.status(500).json({message: "Error deleting category.", error: err.message});
   }
 });
 
