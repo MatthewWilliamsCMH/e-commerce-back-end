@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     if (!tagData) {
       return res.status(404).json({message: "No tags found!"})
     }
-    res.status(200).json(tagData); //reture here?
+    res.status(200).json(tagData);
   }
   catch (err) {
     return res.status(500).json({message: "Error retrieving tags.", error: err.message});
@@ -27,12 +27,13 @@ router.get('/:id', async (req, res) => {
   // be sure to include its associated Product data
   try {
     const tagData = await Tag.findOne({
+      where: {id: req.params.tag_id},
       include: [{model: Product}]
     });
     if (!tagData) {
         return res.status(404).json({message: "Tag not found."})
     }
-    res.status(200).json(tagData); //reture here?
+    res.status(200).json(tagData);
   }
   catch (err) {
     return res.status(500).json({message: "Error retrieving tag.", error: err.message});
@@ -61,7 +62,7 @@ router.put('/:id', async (req, res) => {
       },
       {
         where: {
-          id: req.params.id
+          id: req.params.tag_id
         }
       }
     )
@@ -80,7 +81,7 @@ router.delete('/:id', async (req, res) => {
   try {
     const tagData = await Tag.destroy({
       where: {
-        id: req.params.id
+        id: req.params.tag_id
       }
     });
     if (!tagData) {

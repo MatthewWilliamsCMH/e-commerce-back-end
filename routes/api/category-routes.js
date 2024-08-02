@@ -25,6 +25,7 @@ router.get('/:id', async (req, res) => {
   // be sure to include its associated Products
   try {
     const categoryData = await Category.findOne({
+      where: {id: req.params.category_id},
       include: [{model: Product}]
     });
     if (!categoryData) {
@@ -59,7 +60,7 @@ router.put('/:id', async (req, res) => {
       },
       {
         where: {
-          id: req.params.id,
+          id: req.params.category_id,
         }
       }
     )
@@ -78,7 +79,7 @@ router.delete('/:id', async (req, res) => {
   try {
     const categoryData = await Category.destroy({
       where: {
-        id: req.params.id
+        id: req.params.category_id
       }
     });
     if (!categoryData) {
